@@ -64,7 +64,8 @@ class NaiveBayes:
         :param disease: disease name (string)
         :return: Array of m conditional expectation E(Sj | disease) (for each symptom)
         """
-        pass
+
+        return self.get_p_S_cond_D(disease)
 
     def get_log_p_S_joint_D(self, data, disease):
         """
@@ -147,7 +148,6 @@ def q_3():
     plt.savefig('q3_hist', bbox_inches='tight')
     plt.show()
     plt.close()
-
 
 
 def q_4():
