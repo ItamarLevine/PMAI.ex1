@@ -74,7 +74,11 @@ class NaiveBayes:
         :param disease: disease name (string)
         :return: Array of n log probability values log P(S, disease) (for each data point)
         """
-        pass
+        s_cond_d = np.tile(self.get_p_S_cond_D(disease),data.shape[0]).reshape((-1,data.shape[1]))
+        s_cond_d[np.where(data == 0)] = 1 - s_cond_d[np.where(data == 0)]
+        log_s_cond_d = np.log(s_cond_d)
+        log_s_cond_d = np.sum(log_s_cond_d,axis=1) + self.get_p_D(disease)
+        return np.exp(log_s_cond_d)
 
     def get_log_p_S(self, data):
         """
@@ -82,7 +86,10 @@ class NaiveBayes:
         :param data: Row vectors of data points S (n x m)
         :return: Array of n log probability values log P(S = data) (for each data point)
         """
-        pass
+        p_s = np.zeros((data.shape[0]))
+        for d in self.diseases:
+            p_s += self.get_log_p_S_joint_D(data, d)
+        return np.log(p_s)
 
     def get_p_D_given_S(self, data):
         """
@@ -131,9 +138,14 @@ def q_3():
     TODO. Calculate marginal_log_likelihood on validation data, define prediction rule, 
             and calculate marginal_log_likelihood of test samples classified as real and as corrupted.
     '''
-    validation_marginal_log_likelihood = None
-    real_marginal_log_likelihood = None
-    corrupt_marginal_log_likelihood = None
+    validation_marginal_log_likelihood = nb.get_log_p_S(validation_data)
+    mu = validation_marginal_log_likelihood.mean()
+    sigma = validation_marginal_log_likelihood.std()
+    test_marginal_log_likelihood = nb.get_log_p_S(test_data)
+    real_ind = np.where(test_marginal_log_likelihood >= mu -3*sigma)
+    real_marginal_log_likelihood = test_marginal_log_likelihood[real_ind]
+    corrupt_ind = np.where(test_marginal_log_likelihood < mu - 3 * sigma)
+    corrupt_marginal_log_likelihood = test_marginal_log_likelihood[corrupt_ind]
 
     # plot histograms
     plt.figure()
@@ -172,7 +184,7 @@ def q_5():
     data, labels = mat['data'].values, mat['labels'].values
     pred = nb.predict(data)
     mul_pred = np.zeros(labels.shape)
-    mul_pred[:, pred] = 1
+    mul_pred[np.arange(labels.shape[0]), pred] = 1
     print(f'full-accuracy for Naive Bayes = {accuracy(mul_pred, labels)}')
 
 
@@ -184,10 +196,10 @@ def main():
     nb = NaiveBayes(nb_cpds, symptoms, diseases)
     K, M = len(diseases), len(symptoms)
 
-    q_2()
+    #q_2()
     q_3()
-    q_4()
-    q_5()
+    #q_4()
+    #q_5()
 
 
 if __name__== '__main__':
