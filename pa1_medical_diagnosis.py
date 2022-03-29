@@ -97,7 +97,10 @@ class NaiveBayes:
         :param data: Row vectors of data points S (n x m)
         :return: array of K probabilities p(disease | S = data) (for each disease)
         """
-        pass
+        d_given_s = np.zeros((len(self.diseases),data.shape[0]))
+        for i,d in enumerate(self.diseases):
+            d_given_s[i] = np.exp(self.get_log_p_S_joint_D(data,d))
+        return d_given_s / np.exp(self.get_log_p_S(data))
 
     def predict(self, data):
         """
@@ -106,7 +109,8 @@ class NaiveBayes:
         :param data: Row vectors of data points S (n x m)
         :return: array of n predicted labels (for each data point)
         """
-        pass
+        d_given_s = self.get_p_D_given_S(data)
+        a= 1
 
 
 def q_2():
@@ -197,8 +201,8 @@ def main():
     K, M = len(diseases), len(symptoms)
 
     #q_2()
-    q_3()
-    #q_4()
+    #q_3()
+    q_4()
     #q_5()
 
 
