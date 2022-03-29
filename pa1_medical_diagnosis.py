@@ -99,7 +99,7 @@ class NaiveBayes:
         """
         d_given_s = np.zeros((len(self.diseases),data.shape[0]))
         for i,d in enumerate(self.diseases):
-            d_given_s[i] = np.exp(self.get_log_p_S_joint_D(data,d))
+            d_given_s[i] = self.get_log_p_S_joint_D(data,d)
         return d_given_s / np.exp(self.get_log_p_S(data))
 
     def predict(self, data):
@@ -110,7 +110,7 @@ class NaiveBayes:
         :return: array of n predicted labels (for each data point)
         """
         d_given_s = self.get_p_D_given_S(data)
-        a= 1
+        return np.argmax(d_given_s,axis=0)
 
 
 def q_2():
